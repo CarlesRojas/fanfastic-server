@@ -1,0 +1,31 @@
+{
+    "name": "fanfastic-server",
+    "version": "1.0.0",
+    "description": "The back-end server for the Fanfastic app.",
+    "main": "index.js",
+    "scripts": {
+        "start-dev": "nodemon index.js",
+        "start": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/CarlesRojas/fanfastic-server"
+    },
+    "author": "Carles Rojas",
+    "license": "MIT",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.19.1",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.2",
+        "joi": "^17.5.0",
+        "jsonwebtoken": "^8.5.1",
+        "moment": "^2.29.1",
+        "mongoose": "^6.1.5"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.15"
+    },
+    "homepage": ""
+}
