@@ -1,5 +1,7 @@
 // Get express Router
 const router = require("express").Router();
+
+// Object id type
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 

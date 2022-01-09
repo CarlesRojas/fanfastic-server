@@ -67,11 +67,18 @@ const userSchema = new mongoose.Schema({
         min: 0,
         max: 700,
     },
+    startingWeightObjectiveInKg: {
+        type: Number,
+        required: true,
+        default: -1,
+        min: -1,
+        max: 700,
+    },
     weightObjectiveInKg: {
         type: Number,
         required: true,
-        default: 70.0,
-        min: 0,
+        default: -1,
+        min: -1,
         max: 700,
     },
     fastingStreak: {

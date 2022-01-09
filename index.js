@@ -14,7 +14,7 @@ const schedule = require("node-schedule");
 // Routes
 const userRoutes = require("./routes/user");
 const fastRoutes = require("./routes/fast");
-const weightRoutes = require("./routes/weight");
+const healthRoutes = require("./routes/health");
 
 // Every week function
 const twicePerHour = require("./twicePerHour");
@@ -57,7 +57,7 @@ app.use(bodyParser.json());
 // Routes middlewares
 app.use("/api_v1/user", userRoutes);
 app.use("/api_v1/fast", fastRoutes);
-app.use("/api_v1/weight", weightRoutes);
+app.use("/api_v1/health", healthRoutes);
 
 // #################################################
 //   SCHEDULE JOBS

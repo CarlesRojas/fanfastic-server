@@ -95,6 +95,32 @@ const getMonthFastEntriesValidation = (data) => {
     return schema.validate(data);
 };
 
+const setHeightValidation = (data) => {
+    const schema = Joi.object({
+        heightInCm: Joi.number().min(0).max(300).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const setWeightValidation = (data) => {
+    const schema = Joi.object({
+        weightInKg: Joi.number().min(0).max(700).required(),
+        date: Joi.date().required(),
+        timezoneOffsetInMs: Joi.number().required(),
+    });
+
+    return schema.validate(data);
+};
+
+const setWeightObjectiveValidation = (data) => {
+    const schema = Joi.object({
+        weightObjectiveInKg: Joi.number().min(-1).max(700).required(),
+    });
+
+    return schema.validate(data);
+};
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.changeEmailValidation = changeEmailValidation;
@@ -105,3 +131,6 @@ module.exports.setFastDesiredStartTimeValidation = setFastDesiredStartTimeValida
 module.exports.setFastObjectiveValidation = setFastObjectiveValidation;
 module.exports.userDateTimeValidation = userDateTimeValidation;
 module.exports.getMonthFastEntriesValidation = getMonthFastEntriesValidation;
+module.exports.setHeightValidation = setHeightValidation;
+module.exports.setWeightValidation = setWeightValidation;
+module.exports.setWeightObjectiveValidation = setWeightObjectiveValidation;
