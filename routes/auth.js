@@ -88,11 +88,8 @@ router.post("/login", async (request, response) => {
         const token = webToken.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
             expiresIn: 60 * 60 * 24 * 365 * 100,
         });
-        response.header("token", token).status(200).json({
-            token,
-            username: user.username,
-            id: user._id,
-        });
+
+        response.header("token", token).status(200).json({ token });
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -233,6 +230,22 @@ router.post("/deleteAccount", verify, async (request, response) => {
 
         // Return success
         response.status(200).json({ success: true });
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
+});
+
+router.get("/getUserInfo", verify, async (request, response) => {
+    try {
+        // Deconstruct request
+        const { _id } = request;
+
+        // Get user
+        const user = await User.findOne({ _id });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
+
+        response.status(200).json(user);
     } catch (error) {
         // Return error
         response.status(500).json({ error });

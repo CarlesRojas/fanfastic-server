@@ -22,22 +22,6 @@ const {
 const User = require("../models/User");
 const FastEntry = require("../models/FastEntry");
 
-router.get("/getUserInfo", verify, async (request, response) => {
-    try {
-        // Deconstruct request
-        const { _id } = request;
-
-        // Get user
-        const user = await User.findOne({ _id });
-        if (!user) return response.status(404).json({ error: "User does not exist" });
-
-        response.status(200).json(user);
-    } catch (error) {
-        // Return error
-        response.status(500).json({ error });
-    }
-});
-
 router.post("/setFastDesiredStartTime", verify, async (request, response) => {
     // Validate data
     const { error } = setFastDesiredStartTimeValidation(request.body);
