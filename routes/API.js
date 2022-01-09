@@ -287,7 +287,7 @@ router.post("/getMonthFastEntries", verify, async (request, response) => {
             else responseArray.push(null);
         }
 
-        response.status(200).json({ responseArray });
+        response.status(200).json({ historic: responseArray });
     } catch (error) {
         // Return error
         response.status(500).json({ error });
