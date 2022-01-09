@@ -31,7 +31,7 @@ router.post("/register", async (request, response) => {
     if (error) return response.status(422).json({ error: error.details[0].message });
 
     // Body deconstruction
-    const { email, username, password } = request.body;
+    const { email, username, password, timezoneOffsetInMs } = request.body;
 
     // Check if the email has already been used
     const emailExists = await User.findOne({ email });
@@ -50,6 +50,7 @@ router.post("/register", async (request, response) => {
         username,
         email,
         password: hashedPassword,
+        timezoneOffsetInMs,
     });
 
     try {

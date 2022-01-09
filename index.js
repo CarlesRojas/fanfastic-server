@@ -16,7 +16,7 @@ const apiRoutes = require("./routes/API");
 const authRoutes = require("./routes/auth");
 
 // Every week function
-const everyWeek = require("./everyWeek");
+const twicePerHour = require("./twicePerHour");
 
 // #################################################
 //   ENVIROMENT
@@ -61,7 +61,8 @@ app.use("/api_v1/", apiRoutes);
 //   SCHEDULE JOBS
 // #################################################
 
-schedule.scheduleJob("0 0 * * 1", everyWeek);
+schedule.scheduleJob("*/30 * * * *", twicePerHour);
+twicePerHour();
 
 // #################################################
 //   START SERVER

@@ -5,6 +5,7 @@ const registerValidation = (data) => {
         username: Joi.string().alphanum().min(3).max(12).required(),
         email: Joi.string().min(6).max(256).required().email(),
         password: Joi.string().min(6).max(1024).required(),
+        timezoneOffsetInMs: Joi.number().required(),
     });
 
     return schema.validate(data);

@@ -126,7 +126,7 @@ router.post("/startFasting", verify, async (request, response) => {
         // Update User
         await User.findOneAndUpdate(
             { _id },
-            { $set: { isFasting: true, lastTimeUserStartedFasting: localFastStartDate } }
+            { $set: { isFasting: true, lastTimeUserStartedFasting: localFastStartDate, timezoneOffsetInMs } }
         );
 
         response.status(200).json({ success: true });
@@ -161,11 +161,10 @@ router.post("/stopFasting", verify, async (request, response) => {
         if (!isFasting) return response.status(409).json({ error: "User is not fasting" });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { isFasting: false } });
+        await User.findOneAndUpdate({ _id }, { $set: { isFasting: false, timezoneOffsetInMs } });
 
         // Fasting duration
         const startDate = new Date(lastTimeUserStartedFasting);
-
         const fastDurationInMilliseconds = Math.abs(localFastEndDate - startDate);
         const fastDurationInMinutes = Math.ceil(fastDurationInMilliseconds / 1000 / 60);
 
@@ -226,7 +225,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
         // Update User
         await User.findOneAndUpdate(
             { _id },
-            { $set: { hasWeeklyPass: false, lastTimeUserStartedFasting: localUseWeeklyPassDate } }
+            { $set: { hasWeeklyPass: false, lastTimeUserStartedFasting: localUseWeeklyPassDate, timezoneOffsetInMs } }
         );
 
         // Create entry for fast
