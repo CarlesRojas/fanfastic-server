@@ -53,6 +53,33 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: 0,
     },
+    heightInCm: {
+        type: Number,
+        required: true,
+        default: 165,
+        min: 0,
+        max: 300,
+    },
+    weightInKg: {
+        type: Number,
+        required: true,
+        default: 80.0,
+        min: 0,
+        max: 700,
+    },
+    weightObjectiveInKg: {
+        type: Number,
+        required: true,
+        default: 70.0,
+        min: 0,
+        max: 700,
+    },
+    fastingStreak: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0,
+    },
 });
 
 module.exports = mongoose.model("User", userSchema);

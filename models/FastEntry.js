@@ -35,6 +35,11 @@ const fastEntrySchema = new mongoose.Schema({
         required: true,
         default: false,
     },
+    reachedGoal: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
 });
 
 module.exports = mongoose.model("FastEntry", fastEntrySchema);

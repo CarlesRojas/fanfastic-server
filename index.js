@@ -12,8 +12,9 @@ const bodyParser = require("body-parser");
 const schedule = require("node-schedule");
 
 // Routes
-const apiRoutes = require("./routes/API");
-const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
+const fastRoutes = require("./routes/fast");
+const weightRoutes = require("./routes/weight");
 
 // Every week function
 const twicePerHour = require("./twicePerHour");
@@ -54,8 +55,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Routes middlewares
-app.use("/api_v1/user", authRoutes);
-app.use("/api_v1/", apiRoutes);
+app.use("/api_v1/user", userRoutes);
+app.use("/api_v1/fast", fastRoutes);
+app.use("/api_v1/weight", weightRoutes);
 
 // #################################################
 //   SCHEDULE JOBS
