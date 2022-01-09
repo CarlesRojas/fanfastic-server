@@ -10,14 +10,17 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const schedule = require("node-schedule");
+const webPush = require("web-push");
 
 // Routes
 const userRoutes = require("./routes/user");
 const fastRoutes = require("./routes/fast");
 const healthRoutes = require("./routes/health");
+const pushRoutes = require("./routes/push");
 
 // Every week function
 const twicePerHour = require("./twicePerHour");
+// const notifications = require("./notifications");
 
 // #################################################
 //   ENVIROMENT
@@ -35,6 +38,16 @@ const app = express();
 
 // HTTP access
 const server = http.createServer(app);
+
+// #################################################
+//   PUSH NOTIFICATIONS
+// #################################################
+
+webPush.setVapidDetails(
+    "mailto:fanfastic@carlesrojas.com",
+    process.env.PUBLIC_VAPID_KEY,
+    process.env.PRIVATE_VAPID_KEY
+);
 
 // #################################################
 //   DATABASE
@@ -58,13 +71,14 @@ app.use(bodyParser.json());
 app.use("/api_v1/user", userRoutes);
 app.use("/api_v1/fast", fastRoutes);
 app.use("/api_v1/health", healthRoutes);
+app.use("/api_v1/push", pushRoutes);
 
 // #################################################
 //   SCHEDULE JOBS
 // #################################################
 
 schedule.scheduleJob("*/30 * * * *", twicePerHour);
-twicePerHour();
+// schedule.scheduleJob("*/30 * * * * *", notifications);
 
 // #################################################
 //   START SERVER

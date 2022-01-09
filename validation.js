@@ -1,5 +1,9 @@
 const Joi = require("joi");
 
+// #################################################
+//   USER
+// #################################################
+
 const registerValidation = (data) => {
     const schema = Joi.object({
         username: Joi.string().alphanum().min(3).max(12).required(),
@@ -55,6 +59,10 @@ const deleteAccountValidation = (data) => {
     return schema.validate(data);
 };
 
+// #################################################
+//   FAST
+// #################################################
+
 const setFastDesiredStartTimeValidation = (data) => {
     const schema = Joi.object({
         fastDesiredStartTimeInMinutes: Joi.number()
@@ -95,6 +103,10 @@ const getMonthFastEntriesValidation = (data) => {
     return schema.validate(data);
 };
 
+// #################################################
+//   HEALTH
+// #################################################
+
 const setHeightValidation = (data) => {
     const schema = Joi.object({
         heightInCm: Joi.number().min(0).max(300).required(),
@@ -121,16 +133,41 @@ const setWeightObjectiveValidation = (data) => {
     return schema.validate(data);
 };
 
+// #################################################
+//   PUSH
+// #################################################
+
+const subscriptionValidation = (data) => {
+    const schema = Joi.object({
+        endpoint: Joi.string().required(),
+        expirationTime: Joi.number().allow(null),
+        keys: {
+            auth: Joi.string(),
+            p256dh: Joi.string(),
+        },
+    });
+
+    return schema.validate(data);
+};
+
+// USER
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.changeEmailValidation = changeEmailValidation;
 module.exports.changeUsernameValidation = changeUsernameValidation;
 module.exports.changePasswordValidation = changePasswordValidation;
 module.exports.deleteAccountValidation = deleteAccountValidation;
+
+// FAST
 module.exports.setFastDesiredStartTimeValidation = setFastDesiredStartTimeValidation;
 module.exports.setFastObjectiveValidation = setFastObjectiveValidation;
 module.exports.userDateTimeValidation = userDateTimeValidation;
 module.exports.getMonthFastEntriesValidation = getMonthFastEntriesValidation;
+
+// HEALTH
 module.exports.setHeightValidation = setHeightValidation;
 module.exports.setWeightValidation = setWeightValidation;
 module.exports.setWeightObjectiveValidation = setWeightObjectiveValidation;
+
+// PUSH
+module.exports.subscriptionValidation = subscriptionValidation;
