@@ -140,7 +140,13 @@ router.post("/stopFasting", verify, async (request, response) => {
         const localFastEndDate = new Date(date);
         localFastEndDate.setTime(localFastEndDate.getTime() + timezoneOffsetInMs);
 
-        const { isFasting, fastObjectiveInMinutes, lastTimeUserStartedFasting, fastingStreak } = user;
+        const {
+            isFasting,
+            fastObjectiveInMinutes,
+            lastTimeUserStartedFasting,
+            fastingStreak,
+            totalDaysUserReachedGoal,
+        } = user;
 
         if (!isFasting) return response.status(409).json({ error: "User is not fasting" });
 
@@ -168,7 +174,14 @@ router.post("/stopFasting", verify, async (request, response) => {
         // Update User
         await User.findOneAndUpdate(
             { _id },
-            { $set: { isFasting: false, fastingStreak: reachedGoal ? fastingStreak + 1 : 0, timezoneOffsetInMs } }
+            {
+                $set: {
+                    isFasting: false,
+                    totalDaysUserReachedGoal: reachedGoal ? totalDaysUserReachedGoal + 1 : totalDaysUserReachedGoal,
+                    fastingStreak: reachedGoal ? fastingStreak + 1 : 0,
+                    timezoneOffsetInMs,
+                },
+            }
         );
 
         response.status(200).json({ success: true });
@@ -198,7 +211,14 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
         const localUseWeeklyPassDate = new Date(date);
         localUseWeeklyPassDate.setTime(localUseWeeklyPassDate.getTime() + timezoneOffsetInMs);
 
-        const { isFasting, hasWeeklyPass, fastObjectiveInMinutes, lastTimeUserStartedFasting, fastingStreak } = user;
+        const {
+            isFasting,
+            hasWeeklyPass,
+            fastObjectiveInMinutes,
+            lastTimeUserStartedFasting,
+            fastingStreak,
+            totalDaysUserReachedGoal,
+        } = user;
 
         if (!hasWeeklyPass) return response.status(409).json({ error: "User already used the weekly pass" });
         const lastFastDate = new Date(lastTimeUserStartedFasting);
@@ -226,6 +246,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                     $set: {
                         isFasting: false,
                         hasWeeklyPass: false,
+                        totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,
                     },
@@ -260,6 +281,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                     $set: {
                         hasWeeklyPass: false,
                         lastTimeUserStartedFasting: localUseWeeklyPassDate,
+                        totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,
                     },
@@ -330,25 +352,6 @@ router.post("/getMonthFastEntries", verify, async (request, response) => {
         }
 
         response.status(200).json({ historic: responseArray });
-    } catch (error) {
-        // Return error
-        response.status(500).json({ error });
-    }
-});
-
-router.get("/getTotalDaysUserHasReachedFastingGoal", verify, async (request, response) => {
-    try {
-        // Deconstruct request
-        const { _id } = request;
-
-        // Get user
-        const user = await User.findOne({ _id });
-        if (!user) return response.status(404).json({ error: "User does not exist" });
-
-        // Get all entries for user
-        const entries = await FastEntry.aggregate([{ $match: { userId: ObjectId(_id), reachedGoal: true } }]);
-
-        response.status(200).json({ totalDaysUserReachedFastingGoal: entries.length });
     } catch (error) {
         // Return error
         response.status(500).json({ error });

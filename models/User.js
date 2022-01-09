@@ -87,6 +87,12 @@ const userSchema = new mongoose.Schema({
         default: 0,
         min: 0,
     },
+    totalDaysUserReachedGoal: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0,
+    },
 });
 
 module.exports = mongoose.model("User", userSchema);
