@@ -55,10 +55,10 @@ router.post("/register", async (request, response) => {
 
     try {
         // Save user to DB
-        await user.save();
+        const newUser = await user.save();
 
         // Return the user in the response
-        response.status(201).json({ id: user._id });
+        response.status(201).json(newUser);
     } catch (error) {
         // Return DB error
         response.status(500).json({ error });
@@ -137,10 +137,10 @@ router.post("/changeEmail", verify, async (request, response) => {
         if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { email } });
+        const newUser = await User.findOneAndUpdate({ _id }, { $set: { email } }, { new: true });
 
         // Return success
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -172,10 +172,10 @@ router.post("/changeUsername", verify, async (request, response) => {
         if (repeatedUser) return response.status(409).json({ error: "Username not available." });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { username } });
+        const newUser = await User.findOneAndUpdate({ _id }, { $set: { username } }, { new: true });
 
         // Return success
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -211,10 +211,10 @@ router.post("/changePassword", verify, async (request, response) => {
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { password: hashedPassword } });
+        const newUser = await User.findOneAndUpdate({ _id }, { $set: { password: hashedPassword } }, { new: true });
 
         // Return success
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });

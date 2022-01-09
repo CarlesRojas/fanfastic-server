@@ -43,9 +43,13 @@ router.post("/setFastDesiredStartTime", verify, async (request, response) => {
         if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { fastDesiredStartTimeInMinutes } });
+        const newUser = await User.findOneAndUpdate(
+            { _id },
+            { $set: { fastDesiredStartTimeInMinutes } },
+            { new: true }
+        );
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -69,9 +73,9 @@ router.post("/setFastObjective", verify, async (request, response) => {
         if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { fastObjectiveInMinutes } });
+        const newUser = await User.findOneAndUpdate({ _id }, { $set: { fastObjectiveInMinutes } }, { new: true });
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -108,12 +112,13 @@ router.post("/startFasting", verify, async (request, response) => {
             return response.status(409).json({ error: "User already fasted today" });
 
         // Update User
-        await User.findOneAndUpdate(
+        const newUser = await User.findOneAndUpdate(
             { _id },
-            { $set: { isFasting: true, lastTimeUserStartedFasting: localFastStartDate, timezoneOffsetInMs } }
+            { $set: { isFasting: true, lastTimeUserStartedFasting: localFastStartDate, timezoneOffsetInMs } },
+            { new: true }
         );
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -172,7 +177,7 @@ router.post("/stopFasting", verify, async (request, response) => {
         await fastEntry.save();
 
         // Update User
-        await User.findOneAndUpdate(
+        const newUser = await User.findOneAndUpdate(
             { _id },
             {
                 $set: {
@@ -181,10 +186,11 @@ router.post("/stopFasting", verify, async (request, response) => {
                     fastingStreak: reachedGoal ? fastingStreak + 1 : 0,
                     timezoneOffsetInMs,
                 },
-            }
+            },
+            { new: true }
         );
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -223,6 +229,8 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
         if (!hasWeeklyPass) return response.status(409).json({ error: "User already used the weekly pass" });
         const lastFastDate = new Date(lastTimeUserStartedFasting);
 
+        var newUser = {};
+
         // If user is fasting -> Cancel fasting and use pass (User can fast today again if the fasting started yesterday)
         if (isFasting) {
             // Create entry for fast
@@ -240,7 +248,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             await fastEntry.save();
 
             // Update User
-            await User.findOneAndUpdate(
+            newUser = await User.findOneAndUpdate(
                 { _id },
                 {
                     $set: {
@@ -250,7 +258,8 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,
                     },
-                }
+                },
+                { new: true }
             );
         }
         // Otherwise -> Cancel fasting and use pass (User cannot fast again today)
@@ -275,7 +284,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             await fastEntry.save();
 
             // Update User
-            await User.findOneAndUpdate(
+            newUser = await User.findOneAndUpdate(
                 { _id },
                 {
                     $set: {
@@ -285,11 +294,12 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,
                     },
-                }
+                },
+                { new: true }
             );
         }
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });

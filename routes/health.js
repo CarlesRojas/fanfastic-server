@@ -36,9 +36,9 @@ router.post("/setHeight", verify, async (request, response) => {
         if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Update User
-        await User.findOneAndUpdate({ _id }, { $set: { heightInCm } });
+        const newUser = await User.findOneAndUpdate({ _id }, { $set: { heightInCm } }, { new: true });
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -97,7 +97,7 @@ router.post("/setWeight", verify, async (request, response) => {
         await healthEntry.save();
 
         // Update User
-        await User.findOneAndUpdate(
+        const newUser = await User.findOneAndUpdate(
             { _id },
             {
                 $set: {
@@ -107,10 +107,11 @@ router.post("/setWeight", verify, async (request, response) => {
                             ? weightInKg
                             : startingWeightObjectiveInKg,
                 },
-            }
+            },
+            { new: true }
         );
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
@@ -139,17 +140,18 @@ router.post("/setWeightObjective", verify, async (request, response) => {
             return response.status(404).json({ error: "Objective has already been reached" });
 
         // Update User
-        await User.findOneAndUpdate(
+        const newUser = await User.findOneAndUpdate(
             { _id },
             {
                 $set: {
                     startingWeightObjectiveInKg: weightObjectiveInKg < 0 ? weightObjectiveInKg : weightInKg,
                     weightObjectiveInKg,
                 },
-            }
+            },
+            { new: true }
         );
 
-        response.status(200).json({ success: true });
+        response.status(200).json(newUser);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
