@@ -9,10 +9,14 @@ const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const schedule = require("node-schedule");
 
 // Routes
 const apiRoutes = require("./routes/API");
 const authRoutes = require("./routes/auth");
+
+// Every week function
+const everyWeek = require("./everyWeek");
 
 // #################################################
 //   ENVIROMENT
@@ -52,6 +56,12 @@ app.use(bodyParser.json());
 // Routes middlewares
 app.use("/api_v1/user", authRoutes);
 app.use("/api_v1/", apiRoutes);
+
+// #################################################
+//   SCHEDULE JOBS
+// #################################################
+
+schedule.scheduleJob("0 0 * * 1", everyWeek);
 
 // #################################################
 //   START SERVER

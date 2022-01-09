@@ -19,9 +19,34 @@ const userSchema = new mongoose.Schema({
         min: 6,
         max: 1024,
     },
-    date: {
+    fastDesiredStartTimeInMinutes: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 24 * 60 - 1,
+        default: 21 * 60,
+    },
+    fastObjectiveInMinutes: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 24 * 60 - 1,
+        default: 14 * 60,
+    },
+    lastTimeUserStartedFasting: {
         type: Date,
+        required: true,
         default: Date.now,
+    },
+    isFasting: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    hasWeeklyPass: {
+        type: Boolean,
+        required: true,
+        default: true,
     },
 });
 

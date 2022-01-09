@@ -28,18 +28,18 @@ router.post("/register", async (request, response) => {
     const { error } = registerValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
     // Body deconstruction
     const { email, username, password } = request.body;
 
     // Check if the email has already been used
     const emailExists = await User.findOne({ email });
-    if (emailExists) return response.status(400).json({ error: "Email already taken." });
+    if (emailExists) return response.status(409).json({ error: "Email already taken." });
 
     // Check if the username has already been used
     const userExists = await User.findOne({ username });
-    if (userExists) return response.status(400).json({ error: "Username not available." });
+    if (userExists) return response.status(409).json({ error: "Username not available." });
 
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -57,10 +57,10 @@ router.post("/register", async (request, response) => {
         await user.save();
 
         // Return the user in the response
-        response.json({ id: user._id });
+        response.status(201).json({ id: user._id });
     } catch (error) {
         // Return DB error
-        response.status(400).json({ error });
+        response.status(500).json({ error });
     }
 });
 
@@ -69,26 +69,33 @@ router.post("/login", async (request, response) => {
     const { error } = loginValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
-    // Body deconstruction
-    const { email, password } = request.body;
+    try {
+        // Body deconstruction
+        const { email, password } = request.body;
 
-    // Check if the email exists
-    const user = await User.findOne({ email });
-    if (!user) return response.status(400).json({ error: "This email does not exist." });
+        // Check if the email exists
+        const user = await User.findOne({ email });
+        if (!user) return response.status(404).json({ error: "This email does not exist." });
 
-    // Check if the password is correct
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return response.status(400).json({ error: "Invalid password." });
+        // Check if the password is correct
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
-    // Create and assign token
-    const token = webToken.sign({ _id: user._id }, process.env.TOKEN_SECRET, { expiresIn: 60 * 60 * 24 * 365 * 100 });
-    response.header("token", token).json({
-        token,
-        username: user.username,
-        id: user._id,
-    });
+        // Create and assign token
+        const token = webToken.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+            expiresIn: 60 * 60 * 24 * 365 * 100,
+        });
+        response.header("token", token).status(200).json({
+            token,
+            username: user.username,
+            id: user._id,
+        });
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
 });
 
 router.post("/changeEmail", verify, async (request, response) => {
@@ -96,7 +103,7 @@ router.post("/changeEmail", verify, async (request, response) => {
     const { error } = changeEmailValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
     try {
         // Deconstruct request
@@ -105,24 +112,24 @@ router.post("/changeEmail", verify, async (request, response) => {
 
         // Get user
         const user = await User.findOne({ _id });
-        if (!user) return response.status(400).json({ error: "User does not exist" });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Check that the new email isn't already taken
         const repeatedUser = await User.findOne({ email });
-        if (repeatedUser) return response.status(400).json({ error: "Email already taken." });
+        if (repeatedUser) return response.status(409).json({ error: "Email already taken." });
 
         // Check if the password is correct
         const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return response.status(400).json({ error: "Invalid password." });
+        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
         // Update User
         await User.findOneAndUpdate({ _id }, { $set: { email } });
 
         // Return success
-        response.json({ success: true });
+        response.status(200).json({ success: true });
     } catch (error) {
         // Return error
-        response.status(400).json({ error });
+        response.status(500).json({ error });
     }
 });
 
@@ -131,7 +138,7 @@ router.post("/changeUsername", verify, async (request, response) => {
     const { error } = changeUsernameValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
     try {
         // Deconstruct request
@@ -140,24 +147,24 @@ router.post("/changeUsername", verify, async (request, response) => {
 
         // Get user
         const user = await User.findOne({ _id });
-        if (!user) return response.status(400).json({ error: "User does not exist." });
+        if (!user) return response.status(404).json({ error: "User does not exist." });
 
         // Check if the password is correct
         const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return response.status(400).json({ error: "Invalid password." });
+        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
         // Check that the new username isn't already taken
         const repeatedUser = await User.findOne({ username });
-        if (repeatedUser) return response.status(400).json({ error: "Username not available." });
+        if (repeatedUser) return response.status(409).json({ error: "Username not available." });
 
         // Update User
         await User.findOneAndUpdate({ _id }, { $set: { username } });
 
         // Return success
-        response.json({ success: true });
+        response.status(200).json({ success: true });
     } catch (error) {
         // Return error
-        response.status(400).json({ error });
+        response.status(500).json({ error });
     }
 });
 
@@ -166,7 +173,7 @@ router.post("/changePassword", verify, async (request, response) => {
     const { error } = changePasswordValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
     try {
         // Deconstruct request
@@ -175,15 +182,15 @@ router.post("/changePassword", verify, async (request, response) => {
 
         // Get user
         const user = await User.findOne({ _id });
-        if (!user) return response.status(400).json({ error: "User does not exist" });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Check if the password is correct
         const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return response.status(400).json({ error: "Invalid password." });
+        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
         // Check that the password is different
         const samePassword = await bcrypt.compare(newPassword, user.password);
-        if (samePassword) return response.status(400).json({ error: "The new password is the same." });
+        if (samePassword) return response.status(409).json({ error: "The new password is the same." });
 
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
@@ -193,10 +200,10 @@ router.post("/changePassword", verify, async (request, response) => {
         await User.findOneAndUpdate({ _id }, { $set: { password: hashedPassword } });
 
         // Return success
-        response.json({ success: true });
+        response.status(200).json({ success: true });
     } catch (error) {
         // Return error
-        response.status(400).json({ error });
+        response.status(500).json({ error });
     }
 });
 
@@ -205,7 +212,7 @@ router.post("/deleteAccount", verify, async (request, response) => {
     const { error } = deleteAccountValidation(request.body);
 
     // If there is a validation error
-    if (error) return response.status(400).json({ error: error.details[0].message });
+    if (error) return response.status(422).json({ error: error.details[0].message });
 
     try {
         // Deconstruct request
@@ -214,20 +221,20 @@ router.post("/deleteAccount", verify, async (request, response) => {
 
         // Get user
         const user = await User.findOne({ _id });
-        if (!user) return response.status(400).json({ error: "User does not exist" });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
 
         // Check if the password is correct
         const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return response.status(400).json({ error: "Invalid password." });
+        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
 
         // Delete User
         await User.deleteOne({ _id });
 
         // Return success
-        response.json({ success: true });
+        response.status(200).json({ success: true });
     } catch (error) {
         // Return error
-        response.status(400).json({ error });
+        response.status(500).json({ error });
     }
 });
 
