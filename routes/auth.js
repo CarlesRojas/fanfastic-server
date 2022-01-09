@@ -96,6 +96,22 @@ router.post("/login", async (request, response) => {
     }
 });
 
+router.get("/getUserInfo", verify, async (request, response) => {
+    try {
+        // Deconstruct request
+        const { _id } = request;
+
+        // Get user
+        const user = await User.findOne({ _id });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
+
+        response.status(200).json(user);
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
+});
+
 router.post("/changeEmail", verify, async (request, response) => {
     // Validate data
     const { error } = changeEmailValidation(request.body);
@@ -230,22 +246,6 @@ router.post("/deleteAccount", verify, async (request, response) => {
 
         // Return success
         response.status(200).json({ success: true });
-    } catch (error) {
-        // Return error
-        response.status(500).json({ error });
-    }
-});
-
-router.get("/getUserInfo", verify, async (request, response) => {
-    try {
-        // Deconstruct request
-        const { _id } = request;
-
-        // Get user
-        const user = await User.findOne({ _id });
-        if (!user) return response.status(404).json({ error: "User does not exist" });
-
-        response.status(200).json(user);
     } catch (error) {
         // Return error
         response.status(500).json({ error });
