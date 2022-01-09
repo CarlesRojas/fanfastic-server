@@ -1,9 +1,6 @@
 // Get express Router
 const router = require("express").Router();
 
-// Push notifications
-const webPush = require("web-push");
-
 // Token verification
 const verify = require("./verifyToken");
 
@@ -13,6 +10,10 @@ dotenv.config();
 
 // Get the Validation schemas
 const { subscriptionValidation } = require("../validation");
+
+// Get the schemes
+const User = require("../models/User");
+const PushSubscription = require("../models/PushSubscription");
 
 router.post("/subscribe", verify, async (request, response) => {
     // Validate data
@@ -26,21 +27,23 @@ router.post("/subscribe", verify, async (request, response) => {
         const { _id } = request;
         const subscription = request.body;
 
-        console.log(subscription);
-        response.status(200).json({});
+        // Get user
+        const user = await User.findOne({ _id });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
 
-        console.log(3);
-        // Create payload
-        const payload = JSON.stringify({
-            title: "Push title",
-            body: "This is the text of the notification.",
-            icon: "http://image.ibb.co/frYOFd/tmlogo.png",
+        // Create push subscription
+        const pushSubscription = new PushSubscription({
+            userId: _id,
+            subscription,
         });
 
-        console.log(payload);
-        webPush.sendNotification(subscription, payload);
-        console.log(4);
+        // Save push subscription to DB
+        await pushSubscription.save();
+
+        response.status(200).json({});
     } catch (error) {
+        if (error.code === 11000) return response.status(409).json({ error: "Device already subscribed." });
+
         // Return error
         response.status(500).json({ error });
     }

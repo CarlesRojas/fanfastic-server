@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const notificationSchema = new mongoose.Schema({
+const pushSubscriptionSchema = new mongoose.Schema({
     userId: {
         type: mongoose.ObjectId,
         required: true,
@@ -24,4 +24,4 @@ const notificationSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model("Notification", notificationSchema);
+module.exports = mongoose.model("PushSubscription", pushSubscriptionSchema);

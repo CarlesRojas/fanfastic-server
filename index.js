@@ -20,7 +20,6 @@ const pushRoutes = require("./routes/push");
 
 // Every week function
 const twicePerHour = require("./twicePerHour");
-// const notifications = require("./notifications");
 
 // #################################################
 //   ENVIROMENT
@@ -77,8 +76,8 @@ app.use("/api_v1/push", pushRoutes);
 //   SCHEDULE JOBS
 // #################################################
 
-schedule.scheduleJob("*/30 * * * *", twicePerHour);
-// schedule.scheduleJob("*/30 * * * * *", notifications);
+schedule.scheduleJob("1/30 * * * *", twicePerHour);
+twicePerHour();
 
 // #################################################
 //   START SERVER
