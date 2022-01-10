@@ -32,6 +32,11 @@ const pushSubscriptionSchema = new mongoose.Schema({
         required: true,
         default: false,
     },
+    weightReminderNotificationSentToday: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 });
 
 module.exports = mongoose.model("PushSubscription", pushSubscriptionSchema);

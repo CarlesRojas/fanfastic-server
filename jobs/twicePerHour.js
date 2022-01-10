@@ -4,6 +4,7 @@ const webPush = require("web-push");
 // Get the schemas
 const User = require("../models/User");
 const PushSubscription = require("../models/PushSubscription");
+const HealthEntry = require("../models/HealthEntry");
 
 // Utils
 const areSameDate = require("../utils/areSameDate");
@@ -16,17 +17,8 @@ const twicePerHour = async () => {
     // Get all users
     const users = await User.find({});
 
-    users.map(
-        async ({
-            _id,
-            timezoneOffsetInMs,
-            hasWeeklyPass,
-            isFasting,
-            lastTimeUserStartedFasting,
-            fastingStreak,
-            startFastingNotificationSentToday,
-            stopFastingNotificationSentToday,
-        }) => {
+    const updateUsersPromises = users.map(
+        async ({ _id, timezoneOffsetInMs, hasWeeklyPass, isFasting, lastTimeUserStartedFasting, fastingStreak }) => {
             // Get local date and time of the user
             const userLocalTime = new Date();
             userLocalTime.setTime(userLocalTime.getTime() + timezoneOffsetInMs);
@@ -77,7 +69,13 @@ const twicePerHour = async () => {
     const pushSubscriptions = await PushSubscription.find({});
 
     const notificationPromises = pushSubscriptions.map(
-        async ({ userId, subscription, startFastingNotificationSentToday, stopFastingNotificationSentToday }) => {
+        async ({
+            userId,
+            subscription,
+            startFastingNotificationSentToday,
+            stopFastingNotificationSentToday,
+            weightReminderNotificationSentToday,
+        }) => {
             // Get user
             const user = await User.findOne({ _id: userId });
 
@@ -105,6 +103,7 @@ const twicePerHour = async () => {
 
             var stopFastingSent = false;
             var startFastingSent = false;
+            var weightReminderSent = false;
 
             //   STOP FASTING NOTIFICATION
             // #################################################
@@ -115,11 +114,9 @@ const twicePerHour = async () => {
                 const fastDurationInMilliseconds = Math.abs(userLocalTime - startDate);
                 const fastDurationInMinutes = Math.ceil(fastDurationInMilliseconds / 1000 / 60);
                 const reachedGoal = fastDurationInMinutes >= fastObjectiveInMinutes;
-                console.log(fastDurationInMinutes);
-                console.log(reachedGoal);
 
+                // Send notification
                 if (reachedGoal) {
-                    // Send notification
                     try {
                         const payload = JSON.stringify({ id: "stopFasting" });
                         webPush.sendNotification(subscription, payload);
@@ -140,8 +137,8 @@ const twicePerHour = async () => {
                 const millisecondsSinceMidnight = Math.abs(userLocalTime - midnight);
                 const minutesSinceMidnight = Math.ceil(millisecondsSinceMidnight / 1000 / 60);
 
+                // Send notification
                 if (minutesSinceMidnight > fastDesiredStartTimeInMinutes) {
-                    // Send notification
                     try {
                         const payload = JSON.stringify({ id: "startFasting" });
                         webPush.sendNotification(subscription, payload);
@@ -150,12 +147,46 @@ const twicePerHour = async () => {
                 }
             }
 
+            //   HEALTH CHECK NOTIFICATION
+            // #################################################
+
+            // Find last health entry
+            const newestHealthEntry = await HealthEntry.findOne({ userId }, {}, { sort: { created_at: -1 } });
+            var remindToAddNewHelthEntry = false;
+            if (!newestHealthEntry || !("date" in newestHealthEntry)) remindToAddNewHelthEntry = true;
+            else {
+                const localTimeLastHealthEntry = new Date(newestHealthEntry.date);
+
+                const millisecondsSinceLastHealthEntry = Math.abs(userLocalTime - localTimeLastHealthEntry);
+                const daysSinceLastHealthEntry = millisecondsSinceLastHealthEntry / 1000 / 60 / 60 / 24;
+
+                remindToAddNewHelthEntry = daysSinceLastHealthEntry > 7;
+            }
+
+            // Every day at 12 -> Remind them to input their weight, if they do, then dont remindem until next week
+            if (
+                remindToAddNewHelthEntry &&
+                !weightReminderNotificationSentToday &&
+                hour === 12 &&
+                minute >= 0 &&
+                minute < 30
+            ) {
+                // Send notification
+                try {
+                    const payload = JSON.stringify({ id: "weightReminder" });
+                    webPush.sendNotification(subscription, payload);
+                    weightReminderSent = true;
+                } catch (e) {}
+            }
+
             //   UPDATE PUSH NOTIFICATIONS
             // #################################################
 
             // If it is the first half hour of the day -> Reset notifications
-            const resetPushNotifications =
-                (startFastingNotificationSentToday || stopFastingNotificationSentToday) &&
+            const resetNotifications =
+                (startFastingNotificationSentToday ||
+                    stopFastingNotificationSentToday ||
+                    weightReminderNotificationSentToday) &&
                 hour === 0 &&
                 minute >= 0 &&
                 minute < 30;
@@ -166,21 +197,28 @@ const twicePerHour = async () => {
                     $set: {
                         startFastingNotificationSentToday: startFastingSent
                             ? true
-                            : resetPushNotifications
+                            : resetNotifications
                             ? false
                             : startFastingNotificationSentToday,
 
                         stopFastingNotificationSentToday: stopFastingSent
                             ? true
-                            : resetPushNotifications
+                            : resetNotifications
                             ? false
                             : stopFastingNotificationSentToday,
+
+                        weightReminderNotificationSentToday: weightReminderSent
+                            ? true
+                            : resetNotifications
+                            ? false
+                            : weightReminderNotificationSentToday,
                     },
                 }
             );
         }
     );
 
+    await Promise.all(updateUsersPromises);
     await Promise.all(notificationPromises);
 
     console.log("Twice per hour job done");
