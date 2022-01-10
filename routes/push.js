@@ -27,6 +27,8 @@ router.post("/subscribe", verify, async (request, response) => {
         const { _id } = request;
         const subscription = request.body;
 
+        console.log(subscription);
+
         // Get user
         const user = await User.findOne({ _id });
         if (!user) return response.status(404).json({ error: "User does not exist" });
