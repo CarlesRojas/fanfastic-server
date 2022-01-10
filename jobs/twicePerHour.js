@@ -118,7 +118,7 @@ const twicePerHour = async () => {
                 // Send notification
                 if (reachedGoal) {
                     try {
-                        const payload = JSON.stringify({ id: "stopFasting" });
+                        const payload = JSON.stringify({ id: "stopFasting", user });
                         webPush.sendNotification(subscription, payload);
                         stopFastingSent = true;
                     } catch (e) {}
@@ -140,7 +140,7 @@ const twicePerHour = async () => {
                 // Send notification
                 if (minutesSinceMidnight > fastDesiredStartTimeInMinutes) {
                     try {
-                        const payload = JSON.stringify({ id: "startFasting" });
+                        const payload = JSON.stringify({ id: "startFasting", user });
                         webPush.sendNotification(subscription, payload);
                         startFastingSent = true;
                     } catch (e) {}
@@ -173,7 +173,7 @@ const twicePerHour = async () => {
             ) {
                 // Send notification
                 try {
-                    const payload = JSON.stringify({ id: "weightReminder" });
+                    const payload = JSON.stringify({ id: "weightReminder", user });
                     webPush.sendNotification(subscription, payload);
                     weightReminderSent = true;
                 } catch (e) {}
