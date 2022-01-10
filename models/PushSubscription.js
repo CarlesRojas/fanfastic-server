@@ -22,6 +22,16 @@ const pushSubscriptionSchema = new mongoose.Schema({
             p256dh: String,
         },
     },
+    startFastingNotificationSentToday: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    stopFastingNotificationSentToday: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 });
 
 module.exports = mongoose.model("PushSubscription", pushSubscriptionSchema);

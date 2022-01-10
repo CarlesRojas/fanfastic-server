@@ -19,7 +19,7 @@ const healthRoutes = require("./routes/health");
 const pushRoutes = require("./routes/push");
 
 // Every week function
-const twicePerHour = require("./twicePerHour");
+const twicePerHour = require("./jobs/twicePerHour");
 
 // #################################################
 //   ENVIROMENT
@@ -76,7 +76,7 @@ app.use("/api_v1/push", pushRoutes);
 //   SCHEDULE JOBS
 // #################################################
 
-schedule.scheduleJob("1/30 * * * *", twicePerHour);
+schedule.scheduleJob("*/30 * * * *", twicePerHour);
 twicePerHour();
 
 // #################################################
