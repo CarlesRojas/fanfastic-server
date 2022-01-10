@@ -10,8 +10,11 @@ const webToken = require("jsonwebtoken");
 // Get express Router
 const router = require("express").Router();
 
-// Get User scheme
+// Get schemas
 const User = require("../models/User");
+const FastEntry = require("../models/FastEntry");
+const HealthEntry = require("../models/HealthEntry");
+const PushSubscription = require("../models/PushSubscription");
 
 // Get the Validation schemas
 const {
@@ -243,6 +246,15 @@ router.post("/deleteAccount", verify, async (request, response) => {
 
         // Delete User
         await User.deleteOne({ _id });
+
+        // Delete users Fast Entries
+        await FastEntry.deleteMany({ userId: _id });
+
+        // Delete users Health Entries
+        await HealthEntry.deleteMany({ userId: _id });
+
+        // Delete users Push Subscriptions
+        await PushSubscription.deleteMany({ userId: _id });
 
         // Return success
         response.status(200).json({ success: true });
