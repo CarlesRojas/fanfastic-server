@@ -99,6 +99,10 @@ router.post("/login", async (request, response) => {
     }
 });
 
+router.get("/testToken", verify, (_, response) => {
+    response.status(200).json({ success: true });
+});
+
 router.get("/getUserInfo", verify, async (request, response) => {
     try {
         // Deconstruct request
