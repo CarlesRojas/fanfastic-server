@@ -115,11 +115,13 @@ router.post("/isEmailValid", async (request, response) => {
 
     try {
         // Body deconstruction
-        const { email } = request.body;
+        const { email, checkIfExists } = request.body;
 
         // Check if the email exists
-        const user = await User.findOne({ email });
-        if (user) return response.status(404).json({ error: "This email is already in use." });
+        if (checkIfExists) {
+            const user = await User.findOne({ email });
+            if (user) return response.status(404).json({ error: "This email is already in use." });
+        }
 
         return response.status(200).json({ success: true });
     } catch (error) {

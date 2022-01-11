@@ -27,6 +27,7 @@ const loginValidation = (data) => {
 const isEmailValidValidation = (data) => {
     const schema = Joi.object({
         email: Joi.string().min(6).max(256).required().email(),
+        checkIfExists: Joi.boolean().required(),
     });
 
     return schema.validate(data);
