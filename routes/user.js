@@ -20,6 +20,9 @@ const PushSubscription = require("../models/PushSubscription");
 const {
     registerValidation,
     loginValidation,
+    isEmailValidValidation,
+    isUsernameValidValidation,
+    isPasswordValidValidation,
     changeUsernameValidation,
     changeEmailValidation,
     changePasswordValidation,
@@ -101,6 +104,59 @@ router.post("/login", async (request, response) => {
 
 router.get("/testToken", verify, (_, response) => {
     response.status(200).json({ success: true });
+});
+
+router.post("/isEmailValid", async (request, response) => {
+    // Validate data
+    const { error } = isEmailValidValidation(request.body);
+
+    // If there is a validation error
+    if (error) return response.status(422).json({ error: error.details[0].message });
+
+    try {
+        // Body deconstruction
+        const { email } = request.body;
+
+        // Check if the email exists
+        const user = await User.findOne({ email });
+        if (user) return response.status(404).json({ error: "This email is already in use." });
+
+        return response.status(200).json({ success: true });
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
+});
+
+router.post("/isUsernameValid", async (request, response) => {
+    // Validate data
+    const { error } = isUsernameValidValidation(request.body);
+
+    // If there is a validation error
+    if (error) return response.status(422).json({ error: error.details[0].message });
+
+    try {
+        // Body deconstruction
+        const { username } = request.body;
+
+        // Check if the username exists
+        const user = await User.findOne({ username });
+        if (user) return response.status(404).json({ error: "This username is already taken." });
+
+        return response.status(200).json({ success: true });
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
+});
+
+router.post("/isPasswordValid", async (request, response) => {
+    // Validate data
+    const { error } = isPasswordValidValidation(request.body);
+
+    // If there is a validation error
+    if (error) return response.status(422).json({ error: error.details[0].message });
+    return response.status(200).json({ success: true });
 });
 
 router.get("/getUserInfo", verify, async (request, response) => {

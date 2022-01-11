@@ -24,6 +24,30 @@ const loginValidation = (data) => {
     return schema.validate(data);
 };
 
+const isEmailValidValidation = (data) => {
+    const schema = Joi.object({
+        email: Joi.string().min(6).max(256).required().email(),
+    });
+
+    return schema.validate(data);
+};
+
+const isUsernameValidValidation = (data) => {
+    const schema = Joi.object({
+        username: Joi.string().alphanum().min(3).max(12).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isPasswordValidValidation = (data) => {
+    const schema = Joi.object({
+        password: Joi.string().min(6).max(1024).required(),
+    });
+
+    return schema.validate(data);
+};
+
 const changeEmailValidation = (data) => {
     const schema = Joi.object({
         email: Joi.string().min(6).max(256).required().email(),
@@ -153,6 +177,9 @@ const subscriptionValidation = (data) => {
 // USER
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
+module.exports.isEmailValidValidation = isEmailValidValidation;
+module.exports.isUsernameValidValidation = isUsernameValidValidation;
+module.exports.isPasswordValidValidation = isPasswordValidValidation;
 module.exports.changeEmailValidation = changeEmailValidation;
 module.exports.changeUsernameValidation = changeUsernameValidation;
 module.exports.changePasswordValidation = changePasswordValidation;
