@@ -24,31 +24,6 @@ const loginValidation = (data) => {
     return schema.validate(data);
 };
 
-const isEmailValidValidation = (data) => {
-    const schema = Joi.object({
-        email: Joi.string().min(6).max(256).required().email(),
-        checkIfExists: Joi.boolean().required(),
-    });
-
-    return schema.validate(data);
-};
-
-const isUsernameValidValidation = (data) => {
-    const schema = Joi.object({
-        username: Joi.string().alphanum().min(3).max(12).required(),
-    });
-
-    return schema.validate(data);
-};
-
-const isPasswordValidValidation = (data) => {
-    const schema = Joi.object({
-        password: Joi.string().min(6).max(1024).required(),
-    });
-
-    return schema.validate(data);
-};
-
 const changeEmailValidation = (data) => {
     const schema = Joi.object({
         email: Joi.string().min(6).max(256).required().email(),
@@ -175,12 +150,85 @@ const subscriptionValidation = (data) => {
     return schema.validate(data);
 };
 
+// #################################################
+//   VALIDATE
+// #################################################
+
+const isEmailValidValidation = (data) => {
+    const schema = Joi.object({
+        email: Joi.string().min(6).max(256).required().email(),
+        checkIfExists: Joi.boolean().required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isUsernameValidValidation = (data) => {
+    const schema = Joi.object({
+        username: Joi.string().alphanum().min(3).max(12).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isPasswordValidValidation = (data) => {
+    const schema = Joi.object({
+        password: Joi.string().min(6).max(1024).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isFastDesiredStartTimeValidValidation = (data) => {
+    const schema = Joi.object({
+        fastDesiredStartTimeInMinutes: Joi.number()
+            .min(0)
+            .max(24 * 60 - 1)
+            .required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isFastObjectiveValidValidation = (data) => {
+    const schema = Joi.object({
+        fastObjectiveInMinutes: Joi.number()
+            .min(0)
+            .max(24 * 60 - 1)
+            .required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isHeightValidValidation = (data) => {
+    const schema = Joi.object({
+        heightInCm: Joi.number().min(0).max(300).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isWeightValidValidation = (data) => {
+    const schema = Joi.object({
+        weightInKg: Joi.number().min(0).max(700).required(),
+    });
+
+    return schema.validate(data);
+};
+
+const isWeightObjectiveValidValidation = (data) => {
+    const schema = Joi.object({
+        weightInKg: Joi.number().min(0).max(700).required(),
+        weightObjectiveInKg: Joi.number().min(-1).max(700).required(),
+    });
+
+    return schema.validate(data);
+};
+
 // USER
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
-module.exports.isEmailValidValidation = isEmailValidValidation;
-module.exports.isUsernameValidValidation = isUsernameValidValidation;
-module.exports.isPasswordValidValidation = isPasswordValidValidation;
 module.exports.changeEmailValidation = changeEmailValidation;
 module.exports.changeUsernameValidation = changeUsernameValidation;
 module.exports.changePasswordValidation = changePasswordValidation;
@@ -199,3 +247,13 @@ module.exports.setWeightObjectiveValidation = setWeightObjectiveValidation;
 
 // PUSH
 module.exports.subscriptionValidation = subscriptionValidation;
+
+// VALIDATE API
+module.exports.isEmailValidValidation = isEmailValidValidation;
+module.exports.isUsernameValidValidation = isUsernameValidValidation;
+module.exports.isPasswordValidValidation = isPasswordValidValidation;
+module.exports.isFastDesiredStartTimeValidValidation = isFastDesiredStartTimeValidValidation;
+module.exports.isFastObjectiveValidValidation = isFastObjectiveValidValidation;
+module.exports.isHeightValidValidation = isHeightValidValidation;
+module.exports.isWeightValidValidation = isWeightValidValidation;
+module.exports.isWeightObjectiveValidValidation = isWeightObjectiveValidValidation;

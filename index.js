@@ -17,6 +17,7 @@ const userRoutes = require("./routes/user");
 const fastRoutes = require("./routes/fast");
 const healthRoutes = require("./routes/health");
 const pushRoutes = require("./routes/push");
+const validateRoutes = require("./routes/validate");
 
 // Every week function
 const twicePerHour = require("./jobs/twicePerHour");
@@ -71,6 +72,7 @@ app.use("/api_v1/user", userRoutes);
 app.use("/api_v1/fast", fastRoutes);
 app.use("/api_v1/health", healthRoutes);
 app.use("/api_v1/push", pushRoutes);
+app.use("/api_v1/validate", validateRoutes);
 
 // #################################################
 //   SCHEDULE JOBS
