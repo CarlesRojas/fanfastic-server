@@ -79,7 +79,7 @@ router.post("/setWeight", verify, async (request, response) => {
                     day: { $dayOfMonth: "$date" },
                 },
             },
-            { $match: { year, month, day } },
+            { $match: { userId: ObjectId(_id), year, month, day } },
         ]);
 
         // Only one weight per day
