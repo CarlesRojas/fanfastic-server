@@ -83,7 +83,7 @@ router.post("/setWeight", verify, async (request, response) => {
         ]);
 
         // Only one weight per day
-        if (entries.length > 0) return response.status(404).json({ error: "Already registered weight today" });
+        if (entries.length > 0) return response.status(404).json({ error: "You already registered your weight today" });
 
         // Create entry for health
         const healthEntry = new HealthEntry({
@@ -137,7 +137,7 @@ router.post("/setWeightObjective", verify, async (request, response) => {
         const { weightInKg } = user;
 
         if (weightObjectiveInKg > weightInKg)
-            return response.status(404).json({ error: "Objective has already been reached" });
+            return response.status(404).json({ error: "You already reached this objective" });
 
         // Update User
         const newUser = await User.findOneAndUpdate(

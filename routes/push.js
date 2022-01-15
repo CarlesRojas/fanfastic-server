@@ -42,7 +42,7 @@ router.post("/subscribe", verify, async (request, response) => {
 
         response.status(200).json({});
     } catch (error) {
-        if (error.code === 11000) return response.status(409).json({ error: "Device already subscribed." });
+        if (error.code === 11000) return response.status(409).json({ error: "This device is already subscribed." });
 
         // Return error
         response.status(500).json({ error });

@@ -105,11 +105,11 @@ router.post("/startFasting", verify, async (request, response) => {
         const { isFasting, lastTimeUserStartedFasting } = user;
         const localLastTimeUserStartedFasting = new Date(lastTimeUserStartedFasting);
 
-        if (isFasting) return response.status(409).json({ error: "User already fasting" });
+        if (isFasting) return response.status(409).json({ error: "You are already fasting" });
 
         // If the user already fasted today
         if (areSameDate(localFastStartDate, localLastTimeUserStartedFasting))
-            return response.status(409).json({ error: "User already fasted today" });
+            return response.status(409).json({ error: "You already fasted today" });
 
         // Update User
         const newUser = await User.findOneAndUpdate(
@@ -153,7 +153,7 @@ router.post("/stopFasting", verify, async (request, response) => {
             totalDaysUserReachedGoal,
         } = user;
 
-        if (!isFasting) return response.status(409).json({ error: "User is not fasting" });
+        if (!isFasting) return response.status(409).json({ error: "You are not fasting" });
 
         // Fasting duration
         const startDate = new Date(lastTimeUserStartedFasting);
@@ -227,7 +227,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             totalDaysUserReachedGoal,
         } = user;
 
-        if (!hasWeeklyPass) return response.status(409).json({ error: "User already used the weekly pass" });
+        if (!hasWeeklyPass) return response.status(409).json({ error: "You already used the weekly pass" });
         const lastFastDate = new Date(lastTimeUserStartedFasting);
 
         var newUser = {};
@@ -268,7 +268,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             // If already fasted today -> can't use token
 
             if (areSameDate(localUseWeeklyPassDate, lastFastDate))
-                return response.status(409).json({ error: "User already fasted today" });
+                return response.status(409).json({ error: "You already fasted today" });
 
             // Create entry for fast
             const fastEntry = new FastEntry({
