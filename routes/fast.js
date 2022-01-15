@@ -182,6 +182,7 @@ router.post("/stopFasting", verify, async (request, response) => {
             {
                 $set: {
                     isFasting: false,
+                    lastTimeUserEndedFasting: localFastEndDate,
                     totalDaysUserReachedGoal: reachedGoal ? totalDaysUserReachedGoal + 1 : totalDaysUserReachedGoal,
                     fastingStreak: reachedGoal ? fastingStreak + 1 : 0,
                     timezoneOffsetInMs,

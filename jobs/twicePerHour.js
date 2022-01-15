@@ -79,7 +79,7 @@ const twicePerHour = async () => {
             // Get user
             const user = await User.findOne({ _id: userId });
 
-            // If the user does not exist ->Delete this notification
+            // If the user does not exist -> Delete this notification
             if (!user) {
                 try {
                     await PushSubscription.deleteOne({ userId, "subscription.endpoint": subscription.endpoint });
