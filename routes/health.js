@@ -106,6 +106,7 @@ router.post("/setWeight", verify, async (request, response) => {
                         weightInKg > startingWeightObjectiveInKg && startingWeightObjectiveInKg >= 0
                             ? weightInKg
                             : startingWeightObjectiveInKg,
+                    lastTimeUserEnteredWeight: userLocalTime,
                 },
             },
             { new: true }

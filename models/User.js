@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: () => new Date(+new Date() - 7 * 24 * 60 * 60 * 1000),
     },
+    lastTimeUserEnteredWeight: {
+        type: Date,
+        required: true,
+        default: () => new Date(+new Date() - 7 * 24 * 60 * 60 * 1000),
+    },
     isFasting: {
         type: Boolean,
         required: true,
