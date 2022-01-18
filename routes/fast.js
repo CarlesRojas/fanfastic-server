@@ -160,6 +160,9 @@ router.post("/stopFasting", verify, async (request, response) => {
         const fastDurationInMilliseconds = Math.abs(localFastEndDate - startDate);
         const fastDurationInMinutes = Math.ceil(fastDurationInMilliseconds / 1000 / 60);
 
+        if (localFastEndDate - startDate <= 0)
+            return response.status(409).json({ error: "Invalid fasting entry. You finished before you started." });
+
         const reachedGoal = fastDurationInMinutes >= fastObjectiveInMinutes;
 
         // Create entry for fast
