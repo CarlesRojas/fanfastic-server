@@ -18,7 +18,16 @@ const twicePerHour = async () => {
     const users = await User.find({});
 
     const updateUsersPromises = users.map(
-        async ({ _id, timezoneOffsetInMs, hasWeeklyPass, isFasting, lastTimeUserStartedFasting, fastingStreak }) => {
+        async ({
+            _id,
+            timezoneOffsetInMs,
+            hasWeeklyPass,
+            isFasting,
+            lastTimeUserStartedFasting,
+            fastingStreak,
+            weightInKg,
+            weightObjectiveInKg,
+        }) => {
             // Get local date and time of the user
             const userLocalTime = new Date();
             userLocalTime.setTime(userLocalTime.getTime() + timezoneOffsetInMs);
@@ -35,6 +44,10 @@ const twicePerHour = async () => {
             // If it is the first half hour of monday -> Reset weekly pass
             const resetWeeklyPass = !hasWeeklyPass && weekDay === 1 && hour === 0 && minute >= 0 && minute < 30;
 
+            // If it is the first half hour of monday and the current weight is <= than the goal weight -> Remove weight goal
+            const resetWeightObjective =
+                weightInKg <= weightObjectiveInKg && weekDay === 1 && hour === 0 && minute >= 0 && minute < 30;
+
             // If it has been more than 23 hours since user started fasting, cancel the fasting session
             const cancelFasting = isFasting && timeSinceUserStartedFastingInMinutes > 23 * 60;
 
@@ -48,12 +61,13 @@ const twicePerHour = async () => {
                 fastingStreak > 0 && areSameDate(dayAfterTomorrowFromLastDayUserStartedFasting, userLocalTime);
 
             // Update User
-            if (resetWeeklyPass || cancelFasting || resetStreak)
+            if (resetWeeklyPass || resetWeightObjective || cancelFasting || resetStreak)
                 await User.findOneAndUpdate(
                     { _id },
                     {
                         $set: {
                             hasWeeklyPass: resetWeeklyPass ? true : hasWeeklyPass,
+                            weightObjectiveInKg: resetWeightObjective ? -1 : weightObjectiveInKg,
                             isFasting: cancelFasting ? false : isFasting,
                             fastingStreak: resetStreak || cancelFasting ? 0 : fastingStreak,
                         },
