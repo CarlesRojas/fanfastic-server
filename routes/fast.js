@@ -259,6 +259,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                         isFasting: false,
                         hasWeeklyPass: false,
                         totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
+                        lastTimeUserUsedWeeklyPass: localUseWeeklyPassDate,
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,
                     },
@@ -294,6 +295,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                     $set: {
                         hasWeeklyPass: false,
                         lastTimeUserStartedFasting: localUseWeeklyPassDate,
+                        lastTimeUserUsedWeeklyPass: localUseWeeklyPassDate,
                         totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
                         fastingStreak: fastingStreak + 1,
                         timezoneOffsetInMs,

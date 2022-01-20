@@ -48,6 +48,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: () => new Date(+new Date() - 7 * 24 * 60 * 60 * 1000),
     },
+    lastTimeUserUsedWeeklyPass: {
+        type: Date,
+        required: true,
+        default: () => new Date(+new Date() - 8 * 24 * 60 * 60 * 1000),
+    },
     isFasting: {
         type: Boolean,
         required: true,
