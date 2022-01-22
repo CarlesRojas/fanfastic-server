@@ -49,4 +49,23 @@ router.post("/subscribe", verify, async (request, response) => {
     }
 });
 
+router.get("/unsubscribe", verify, async (request, response) => {
+    try {
+        // Deconstruct request
+        const { _id } = request;
+
+        // Get user
+        const user = await User.findOne({ _id });
+        if (!user) return response.status(404).json({ error: "User does not exist" });
+
+        // Delete users Push Subscriptions
+        await PushSubscription.deleteMany({ userId: _id });
+
+        response.status(200).json({});
+    } catch (error) {
+        // Return error
+        response.status(500).json({ error });
+    }
+});
+
 module.exports = router;
