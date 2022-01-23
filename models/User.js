@@ -89,6 +89,13 @@ const userSchema = new mongoose.Schema({
         min: -1,
         max: 700,
     },
+    veryFirstWeightInKg: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0,
+        max: 700,
+    },
     weightObjectiveInKg: {
         type: Number,
         required: true,

@@ -61,7 +61,7 @@ router.post("/setWeight", verify, async (request, response) => {
         const user = await User.findOne({ _id });
         if (!user) return response.status(404).json({ error: "User does not exist" });
 
-        const { heightInCm, startingWeightObjectiveInKg } = user;
+        const { heightInCm, startingWeightObjectiveInKg, veryFirstWeightInKg } = user;
 
         // Get local date of the user
         const userLocalTime = new Date(date);
@@ -102,6 +102,7 @@ router.post("/setWeight", verify, async (request, response) => {
             {
                 $set: {
                     weightInKg,
+                    veryFirstWeightInKg: veryFirstWeightInKg === 0 ? weightInKg : veryFirstWeightInKg,
                     startingWeightObjectiveInKg:
                         weightInKg > startingWeightObjectiveInKg && startingWeightObjectiveInKg >= 0
                             ? weightInKg
