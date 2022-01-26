@@ -6,7 +6,6 @@ const Joi = require("joi");
 
 const registerValidation = (data) => {
     const schema = Joi.object({
-        username: Joi.string().alphanum().min(3).max(12).required(),
         email: Joi.string().min(6).max(256).required().email(),
         password: Joi.string().min(6).max(1024).required(),
         timezoneOffsetInMs: Joi.number().required(),
@@ -27,15 +26,6 @@ const loginValidation = (data) => {
 const changeEmailValidation = (data) => {
     const schema = Joi.object({
         email: Joi.string().min(6).max(256).required().email(),
-        password: Joi.string().min(6).max(1024).required(),
-    });
-
-    return schema.validate(data);
-};
-
-const changeUsernameValidation = (data) => {
-    const schema = Joi.object({
-        username: Joi.string().alphanum().min(3).max(12).required(),
         password: Joi.string().min(6).max(1024).required(),
     });
 
@@ -163,14 +153,6 @@ const isEmailValidValidation = (data) => {
     return schema.validate(data);
 };
 
-const isUsernameValidValidation = (data) => {
-    const schema = Joi.object({
-        username: Joi.string().alphanum().min(3).max(12).required(),
-    });
-
-    return schema.validate(data);
-};
-
 const isPasswordValidValidation = (data) => {
     const schema = Joi.object({
         password: Joi.string().min(6).max(1024).required(),
@@ -230,7 +212,6 @@ const isWeightObjectiveValidValidation = (data) => {
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.changeEmailValidation = changeEmailValidation;
-module.exports.changeUsernameValidation = changeUsernameValidation;
 module.exports.changePasswordValidation = changePasswordValidation;
 module.exports.deleteAccountValidation = deleteAccountValidation;
 
@@ -250,7 +231,6 @@ module.exports.subscriptionValidation = subscriptionValidation;
 
 // VALIDATE API
 module.exports.isEmailValidValidation = isEmailValidValidation;
-module.exports.isUsernameValidValidation = isUsernameValidValidation;
 module.exports.isPasswordValidValidation = isPasswordValidValidation;
 module.exports.isFastDesiredStartTimeValidValidation = isFastDesiredStartTimeValidValidation;
 module.exports.isFastObjectiveValidValidation = isFastObjectiveValidValidation;

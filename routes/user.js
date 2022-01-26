@@ -20,7 +20,6 @@ const PushSubscription = require("../models/PushSubscription");
 const {
     registerValidation,
     loginValidation,
-    changeUsernameValidation,
     changeEmailValidation,
     changePasswordValidation,
     deleteAccountValidation,
@@ -34,15 +33,11 @@ router.post("/register", async (request, response) => {
     if (error) return response.status(422).json({ error: error.details[0].message });
 
     // Body deconstruction
-    const { email, username, password, timezoneOffsetInMs } = request.body;
+    const { email, password, timezoneOffsetInMs } = request.body;
 
     // Check if the email has already been used
     const emailExists = await User.findOne({ email });
     if (emailExists) return response.status(409).json({ error: "Email already taken." });
-
-    // Check if the username has already been used
-    const userExists = await User.findOne({ username });
-    if (userExists) return response.status(409).json({ error: "Username not available." });
 
     // Hash the password
     const salt = await bcrypt.genSalt(10);
@@ -50,7 +45,6 @@ router.post("/register", async (request, response) => {
 
     // Create User
     const user = new User({
-        username,
         email,
         password: hashedPassword,
         timezoneOffsetInMs,
@@ -145,41 +139,6 @@ router.post("/changeEmail", verify, async (request, response) => {
 
         // Update User
         const newUser = await User.findOneAndUpdate({ _id }, { $set: { email } }, { new: true });
-
-        // Return success
-        response.status(200).json(newUser);
-    } catch (error) {
-        // Return error
-        response.status(500).json({ error });
-    }
-});
-
-router.post("/changeUsername", verify, async (request, response) => {
-    // Validate data
-    const { error } = changeUsernameValidation(request.body);
-
-    // If there is a validation error
-    if (error) return response.status(422).json({ error: error.details[0].message });
-
-    try {
-        // Deconstruct request
-        const { _id } = request;
-        const { username, password } = request.body;
-
-        // Get user
-        const user = await User.findOne({ _id });
-        if (!user) return response.status(404).json({ error: "User does not exist." });
-
-        // Check if the password is correct
-        const validPassword = await bcrypt.compare(password, user.password);
-        if (!validPassword) return response.status(403).json({ error: "Invalid password." });
-
-        // Check that the new username isn't already taken
-        const repeatedUser = await User.findOne({ username });
-        if (repeatedUser) return response.status(409).json({ error: "Username not available." });
-
-        // Update User
-        const newUser = await User.findOneAndUpdate({ _id }, { $set: { username } }, { new: true });
 
         // Return success
         response.status(200).json(newUser);
