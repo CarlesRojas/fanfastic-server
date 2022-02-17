@@ -79,7 +79,6 @@ app.use("/api_v1/validate", validateRoutes);
 // #################################################
 
 schedule.scheduleJob("*/30 * * * *", twicePerHour);
-twicePerHour();
 
 // #################################################
 //   START SERVER

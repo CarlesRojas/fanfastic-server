@@ -145,13 +145,7 @@ router.post("/stopFasting", verify, async (request, response) => {
         const localFastEndDate = new Date(date);
         localFastEndDate.setTime(localFastEndDate.getTime() + timezoneOffsetInMs);
 
-        const {
-            isFasting,
-            fastObjectiveInMinutes,
-            lastTimeUserStartedFasting,
-            fastingStreak,
-            totalDaysUserReachedGoal,
-        } = user;
+        const { isFasting, fastObjectiveInMinutes, lastTimeUserStartedFasting } = user;
 
         if (!isFasting) return response.status(409).json({ error: "You are not fasting" });
 
@@ -176,8 +170,45 @@ router.post("/stopFasting", verify, async (request, response) => {
             reachedGoal,
         });
 
-        // Save user to DB
+        // Save fast entry to DB
         await fastEntry.save();
+
+        //  Count fasting streak and total
+        const fastingEntries = await FastEntry.find({ userId: _id, reachedGoal: true }).sort({ fastEndDate: "desc" });
+
+        var streak = 0;
+        var prevDate = null;
+
+        if (reachedGoal) {
+            for (let i = 0; i < fastingEntries.length; i++) {
+                const { fastStartDate } = fastingEntries[i];
+
+                if (i === 0) {
+                    prevDate = new Date(fastStartDate);
+                    streak++;
+                    continue;
+                }
+
+                // Reduce one day from prevDate
+                prevDate.setDate(prevDate.getUTCDate() - 1);
+
+                const prevDay = prevDate.getUTCDate();
+                const prevMonth = prevDate.getUTCMonth();
+                const prevYear = prevDate.getUTCFullYear();
+
+                const entryDate = new Date(fastStartDate);
+                const day = entryDate.getUTCDate();
+                const month = entryDate.getUTCMonth();
+                const year = entryDate.getUTCFullYear();
+
+                if (prevDay === day && prevMonth === month && prevYear === year) {
+                    prevDate = entryDate;
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+        }
 
         // Update User
         const newUser = await User.findOneAndUpdate(
@@ -186,8 +217,8 @@ router.post("/stopFasting", verify, async (request, response) => {
                 $set: {
                     isFasting: false,
                     lastTimeUserEndedFasting: localFastEndDate,
-                    totalDaysUserReachedGoal: reachedGoal ? totalDaysUserReachedGoal + 1 : totalDaysUserReachedGoal,
-                    fastingStreak: reachedGoal ? fastingStreak + 1 : 0,
+                    totalDaysUserReachedGoal: fastingEntries.length,
+                    fastingStreak: streak,
                     timezoneOffsetInMs,
                 },
             },
@@ -221,14 +252,7 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
         const localUseWeeklyPassDate = new Date(date);
         localUseWeeklyPassDate.setTime(localUseWeeklyPassDate.getTime() + timezoneOffsetInMs);
 
-        const {
-            isFasting,
-            hasWeeklyPass,
-            fastObjectiveInMinutes,
-            lastTimeUserStartedFasting,
-            fastingStreak,
-            totalDaysUserReachedGoal,
-        } = user;
+        const { isFasting, hasWeeklyPass, fastObjectiveInMinutes, lastTimeUserStartedFasting } = user;
 
         if (!hasWeeklyPass) return response.status(409).json({ error: "You already used the weekly pass" });
         const lastFastDate = new Date(lastTimeUserStartedFasting);
@@ -251,6 +275,43 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             // Save user to DB
             await fastEntry.save();
 
+            //  Count fasting streak and total
+            const fastingEntries = await FastEntry.find({ userId: _id, reachedGoal: true }).sort({
+                fastEndDate: "desc",
+            });
+
+            var streak = 0;
+            var prevDate = null;
+
+            for (let i = 0; i < fastingEntries.length; i++) {
+                const { fastStartDate } = fastingEntries[i];
+
+                if (i === 0) {
+                    prevDate = new Date(fastStartDate);
+                    streak++;
+                    continue;
+                }
+
+                // Reduce one day from prevDate
+                prevDate.setDate(prevDate.getUTCDate() - 1);
+
+                const prevDay = prevDate.getUTCDate();
+                const prevMonth = prevDate.getUTCMonth();
+                const prevYear = prevDate.getUTCFullYear();
+
+                const entryDate = new Date(fastStartDate);
+                const day = entryDate.getUTCDate();
+                const month = entryDate.getUTCMonth();
+                const year = entryDate.getUTCFullYear();
+
+                if (prevDay === day && prevMonth === month && prevYear === year) {
+                    prevDate = entryDate;
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
             // Update User
             newUser = await User.findOneAndUpdate(
                 { _id },
@@ -258,9 +319,9 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                     $set: {
                         isFasting: false,
                         hasWeeklyPass: false,
-                        totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
+                        totalDaysUserReachedGoal: fastingEntries.length,
                         lastTimeUserUsedWeeklyPass: localUseWeeklyPassDate,
-                        fastingStreak: fastingStreak + 1,
+                        fastingStreak: streak,
                         timezoneOffsetInMs,
                     },
                 },
@@ -288,6 +349,43 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
             // Save user to DB
             await fastEntry.save();
 
+            //  Count fasting streak and total
+            const fastingEntries = await FastEntry.find({ userId: _id, reachedGoal: true }).sort({
+                fastEndDate: "desc",
+            });
+
+            var streak = 0;
+            var prevDate = null;
+
+            for (let i = 0; i < fastingEntries.length; i++) {
+                const { fastStartDate } = fastingEntries[i];
+
+                if (i === 0) {
+                    prevDate = new Date(fastStartDate);
+                    streak++;
+                    continue;
+                }
+
+                // Reduce one day from prevDate
+                prevDate.setDate(prevDate.getUTCDate() - 1);
+
+                const prevDay = prevDate.getUTCDate();
+                const prevMonth = prevDate.getUTCMonth();
+                const prevYear = prevDate.getUTCFullYear();
+
+                const entryDate = new Date(fastStartDate);
+                const day = entryDate.getUTCDate();
+                const month = entryDate.getUTCMonth();
+                const year = entryDate.getUTCFullYear();
+
+                if (prevDay === day && prevMonth === month && prevYear === year) {
+                    prevDate = entryDate;
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+
             // Update User
             newUser = await User.findOneAndUpdate(
                 { _id },
@@ -296,8 +394,8 @@ router.post("/useWeeklyPass", verify, async (request, response) => {
                         hasWeeklyPass: false,
                         lastTimeUserStartedFasting: localUseWeeklyPassDate,
                         lastTimeUserUsedWeeklyPass: localUseWeeklyPassDate,
-                        totalDaysUserReachedGoal: totalDaysUserReachedGoal + 1,
-                        fastingStreak: fastingStreak + 1,
+                        totalDaysUserReachedGoal: fastingEntries.length,
+                        fastingStreak: streak,
                         timezoneOffsetInMs,
                     },
                 },
