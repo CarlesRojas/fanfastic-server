@@ -56,7 +56,7 @@ const twicePerHour = async () => {
                 dayAfterTomorrowFromLastDayUserStartedFasting.getDate() + 2
             );
 
-            // Reset streak
+            // Reset streak if needed
             const resetStreak =
                 fastingStreak > 0 && areSameDate(dayAfterTomorrowFromLastDayUserStartedFasting, userLocalTime);
 
